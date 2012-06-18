@@ -54,18 +54,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- JDBC Driver -->
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.17</version>
-        </dependency>
-
         <!-- For tests -->
         <dependency>
             <groupId>junit</groupId>
@@ -79,9 +67,12 @@
             <version>1.8.0.10</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
+
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
     </properties>
+    
 </project>
 
