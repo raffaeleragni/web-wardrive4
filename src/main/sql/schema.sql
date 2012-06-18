@@ -32,3 +32,12 @@ create table wifi
   key wifi_search (security, lat, lon)
 )
 engine=MyISAM default charset=utf8;
+
+-- Users table
+create table users
+(
+  username varchar(255),
+  password varchar(255),
+  primary key(username)
+)
+engine=MyISAM default charset=utf8;
