@@ -8,7 +8,7 @@
 
     <!-- Project variables -->
 
-    <name>Wardrive [Web]</name>
+    <name>wardrive4-web</name>
     <groupId>ki.wardrive4.web</groupId>
     <artifactId>wardrive4-web</artifactId>
     <version>1.0-SNAPSHOT</version>

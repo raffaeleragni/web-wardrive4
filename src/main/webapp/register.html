@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+        <script type="text/javascript">google.load("jquery", "1.7");</script>
+        <script type="text/javascript">
+
+            $().ready(function()
+            {
+                var keyupTimeout = null;
+                $("#username").keyup(function (e)
+                {
+                    if (keyupTimeout != null)
+                    {
+                        clearTimeout(keyupTimeout);
+                        keyupTimeout = null;
+                    }
+                    keyupTimeout = setTimeout(function ()
+                    {
+                        $("#username").removeClass("ok");
+                        $("#username").removeClass("error");
+                        $("#username").addClass("checking");
+
+                        $.ajax(
+                        {
+                            url: "usernameavailable",
+                            data: {username: $("#username").val()},
+                            dataType: "json",
+                            success: function (d)
+                            {
+                                if (d)
+                                {
+                                    $("#username").removeClass("checking");
+                                    $("#username").addClass("ok");
+                                }
+                                else
+                                {
+                                    $("#username").removeClass("checking");
+                                    $("#username").addClass("error");
+                                }
+                            }
+                        });
+                        keyupTimeout = null;
+                    },
+                    750);
+                });
+            });
+
+        </script>
+        <style type="text/css">
+            input[type="text"]
+                {border-radius: 10px; height: 30px; line-height: 30px; font-size: 18px; color: black; border: solid 1px black; padding: 0 5px}
+            input[type="text"].checking
+                {color: gray}
+            input[type="text"].ok
+                {color: green}
+            input[type="text"].error
+                {color: red}
+        </style>
+    </head>
+    <body>
+        <form>
+            <input id="username" type="text" name="username"/>
+        </form>
+    </body>
+</html>
