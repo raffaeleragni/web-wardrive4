@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path=""/>
+<Context antiJARLocking="true" path="">
+    <ResourceLink
+        name="jdbc/wardrive4"
+        global="jdbc/wardrive4"
+        type="javax.sql.DataSource"/>
+</Context>
