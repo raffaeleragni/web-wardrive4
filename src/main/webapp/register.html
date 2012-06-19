@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title></title>
         <meta charset="UTF-8"/>
         <script src="http://www.google.com/jsapi" type="text/javascript"></script>
         <script type="text/javascript">google.load("jquery", "1.7");</script>
@@ -29,7 +30,7 @@
                             dataType: "json",
                             success: function (d)
                             {
-                                if (d)
+                                if (d && $("#username").val().length > 0)
                                 {
                                     $("#username").removeClass("checking");
                                     $("#username").addClass("ok");
@@ -45,23 +46,46 @@
                     },
                     750);
                 });
+
+                $("#password, #password2").keyup(function ()
+                {
+                    var p1 = $("#password").val();
+                    var p2 = $("#password2").val();
+                    if (p1 == p2 && p1.length > 0)
+                        $("#password, #password2").removeClass("error");
+                    else
+                        $("#password, #password2").addClass("error");
+                });
+
+                // Trigger the event so it sets them to error for being blank
+                $("#username, #password, #password2").addClass("error");
             });
+
+            function validate()
+            {
+                if ($("form .error").length > 0)
+                    return false;
+                return true;
+            }
 
         </script>
         <style type="text/css">
-            input[type="text"]
-                {border-radius: 10px; height: 30px; line-height: 30px; font-size: 18px; color: black; border: solid 1px black; padding: 0 5px}
+            input[type="text"], input[type="password"]
+                {color: black}
             input[type="text"].checking
                 {color: gray}
             input[type="text"].ok
                 {color: green}
-            input[type="text"].error
-                {color: red}
+            input[type="text"].error, input[type="password"].error
+                {color: red; border: solid 1px red;}
         </style>
     </head>
     <body>
-        <form>
-            <input id="username" type="text" name="username"/>
+        <form action="register" method="post" onsubmit="return validate()">
+            <label for="username">Username: </label><input id="username" type="text" name="username"/><br/>
+            <label for="password">Password: </label><input id="password" type="password" name="password"/><br/>
+            <label for="password">[Password repeated]: </label><input id="password2" type="password" name="password2"/><br/>
+            <button type="submit">Register</button>
         </form>
     </body>
 </html>

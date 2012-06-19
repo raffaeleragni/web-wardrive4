@@ -20,11 +20,13 @@ package ki.wardrive4.web.servlet;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static ki.wardrive4.web.utils.ConnectionUtils.getConnection;
+import static ki.wardrive4.web.utils.SHA1Utils.sha1;
 
 /**
  *
@@ -34,10 +36,30 @@ public class RegisterServlet extends HttpServlet
 {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-//        try (Connection c = getConnection())
-//        {
-//
-//        }
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String password2 = request.getParameter("password2");
+
+        if (username == null || password == null || password2 == null ||
+            username.isEmpty() || password.isEmpty() || password2.isEmpty() ||
+            !password.equals(password2))
+        {
+            response.setStatus(500);
+            return;
+        }
+
+        try (Connection c = getConnection())
+        {
+            try (PreparedStatement s = c.prepareStatement(
+                "insert into users(username, password) values(?, ?)"))
+            {
+                s.setString(1, username);
+                s.setString(2, sha1(password));
+                s.executeUpdate();
+            }
+        }
+
+        response.sendRedirect("registerok.html");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
