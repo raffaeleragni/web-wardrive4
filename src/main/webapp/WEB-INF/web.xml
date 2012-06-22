@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
-    
     <display-name>wardrive4</display-name>
-    
     <servlet>
         <servlet-name>index</servlet-name>
         <servlet-class>ki.wardrive4.web.servlet.IndexServlet</servlet-class>
@@ -11,7 +9,6 @@
         <servlet-name>index</servlet-name>
         <url-pattern>/index</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>login</servlet-name>
         <servlet-class>ki.wardrive4.web.servlet.LoginServlet</servlet-class>
@@ -20,16 +17,22 @@
         <servlet-name>login</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>ajax-login</servlet-name>
-        <servlet-class>ki.wardrive4.web.servlet.AJAXLoginServlet</servlet-class>
+        <servlet-class>ki.wardrive4.web.servlet.android.AJAXLoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ajax-login</servlet-name>
         <url-pattern>/ajaxlogin</url-pattern>
     </servlet-mapping>
-    
+    <servlet>
+        <servlet-name>ajax-sync</servlet-name>
+        <servlet-class>ki.wardrive4.web.servlet.android.SyncServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ajax-sync</servlet-name>
+        <url-pattern>/ajaxsync</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>username-available</servlet-name>
         <servlet-class>ki.wardrive4.web.servlet.UsernameAvailableServlet</servlet-class>
@@ -38,7 +41,6 @@
         <servlet-name>username-available</servlet-name>
         <url-pattern>/usernameavailable</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>register</servlet-name>
         <servlet-class>ki.wardrive4.web.servlet.RegisterServlet</servlet-class>
@@ -47,15 +49,12 @@
         <servlet-name>register</servlet-name>
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
-    
     <resource-ref>
         <res-ref-name>jdbc/wardrive4</res-ref-name>
         <res-ref-type>javax.sql.DataSource</res-ref-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-    
     <welcome-file-list>
         <welcome-file>index</welcome-file>
     </welcome-file-list>
-    
 </web-app>

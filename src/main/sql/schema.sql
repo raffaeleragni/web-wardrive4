@@ -3,8 +3,9 @@
 
 create table wifi
 (
-  -- The id is a SHA1 (so max 40 chars)
+  -- The id is a SHA1 (so max 40 chars) + the username
   id varchar(40),
+  fk_user varchar(255),
   -- The bssid is a MAC address (so max 18 including ':')
   bssid varchar(18),
   -- Undefinite length for ssid
@@ -26,10 +27,14 @@ create table wifi
   --
   geohash varchar(255),
   --
-  `timestamp` datetime,
+  t_timestamp datetime,
   --
-  primary key(id),
-  key wifi_search (security, lat, lon)
+  -- for possible future use, and also for correctness, create the constraint anyway
+  constraint foreign key fk_user(fk_user) references users(username) on delete cascade,
+  --
+  primary key(id, fk_user),
+  key wifi_search (fk_user, security, lat, lon),
+  key wifi_sync (fk_user, t_timestamp)
 )
 engine=MyISAM default charset=utf8;
 

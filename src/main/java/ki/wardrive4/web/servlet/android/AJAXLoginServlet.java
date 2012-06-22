@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ki.wardrive4.web.servlet;
+package ki.wardrive4.web.servlet.android;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,6 +26,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import ki.wardrive4.web.servlet.LoginServlet;
 import static ki.wardrive4.web.utils.ConnectionUtils.getConnection;
 import static ki.wardrive4.web.utils.SHA1Utils.sha1;
 
@@ -62,7 +63,10 @@ public class AJAXLoginServlet extends HttpServlet
                 {
                     rs.next();
                     if (rs.getInt(1) > 0)
+                    {
+                        request.getSession().setAttribute(LoginServlet.ATT_USERNAME, username);
                         response.setStatus(HttpServletResponse.SC_OK);
+                    }
                     else
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 }
