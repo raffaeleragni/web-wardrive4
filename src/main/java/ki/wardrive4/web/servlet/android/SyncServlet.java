@@ -21,6 +21,7 @@ package ki.wardrive4.web.servlet.android;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import ki.wardrive4.web.android.Sync;
@@ -62,10 +64,9 @@ public class SyncServlet extends HttpServlet
                 case "fetch":
                     long mark = Long.parseLong(request.getParameter("mark"));
                     // Dump out the JSON
-                    String out = Sync.fetch(c, username, mark);
-                    response.setContentType("text/json");
-                    response.setContentLength(out.length());
-                    response.getWriter().write(out);
+                    List<WiFi> out = Sync.fetch(c, username, mark);
+                    response.setContentType("text/xml");
+                    marshaller.marshal(out, response.getWriter());
                     break;
 
                 case "push":
@@ -79,13 +80,16 @@ public class SyncServlet extends HttpServlet
         }
     }
     
-    // Keep an unmarshaller always ready.
+    // Keep them always ready.
+    private static Marshaller marshaller;
     private static Unmarshaller unmarshaller;
     static
     {
         try
         {
-            unmarshaller = JAXBContext.newInstance(WiFis.class, WiFi.class).createUnmarshaller();
+            JAXBContext ctx = JAXBContext.newInstance(WiFis.class, WiFi.class);
+            marshaller = ctx.createMarshaller();
+            unmarshaller = ctx.createUnmarshaller();
         }
         catch (JAXBException ex)
         {

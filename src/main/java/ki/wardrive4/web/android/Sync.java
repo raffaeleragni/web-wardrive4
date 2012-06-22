@@ -20,10 +20,10 @@
 package ki.wardrive4.web.android;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.naming.NamingException;
 import ki.wardrive4.web.data.WiFi;
-import ki.wardrive4.web.utils.JSONBuilder;
 
 /**
  * Sync logic.
@@ -36,7 +36,7 @@ public class Sync
     // minimum, and increment the frequency of updates.
     private static final int PAGE_LIMIT = 10;
     
-    public static String fetch(Connection c, String username, long mark) throws NamingException, SQLException
+    public static List<WiFi> fetch(Connection c, String username, long mark) throws NamingException, SQLException
     {
         // Android will send us the last mark of where the last sync has ended.
         // The last mark is the max value of all the previously synchronized
@@ -51,18 +51,26 @@ public class Sync
                 // Return all the limited items. Being them ordered, each
                 // sequential call to this service, given the right mark,
                 // will advance incrementally in the synchronization.
-                JSONBuilder jb = new JSONBuilder();
-                jb.beginArray();
+                List<WiFi> wifis = new ArrayList<>();
                 ResultSetMetaData rsmd = rs.getMetaData();
                 while (rs.next())
                 {
-                    jb.beginObject();
-                    for (int i = 1; i <= rsmd.getColumnCount(); i++)
-                        jb.property(rsmd.getColumnLabel(i), rs.getObject(i));
-                    jb.endObject();
+                    WiFi w = new WiFi();
+                    w.id = rs.getString("id");
+                    w.bssid = rs.getString("bssid");
+                    w.ssid = rs.getString("ssid");
+                    w.capabilities = rs.getString("capabilities");
+                    w.security = rs.getInt("security");
+                    w.level = rs.getInt("level");
+                    w.frequency = rs.getInt("frequency");
+                    w.lat = rs.getDouble("lat");
+                    w.lon = rs.getDouble("lon");
+                    w.alt = rs.getDouble("alt");
+                    w.geohash = rs.getString("geohash");
+                    w.timestamp = rs.getTimestamp("t_timestamp").getTime();
+                    wifis.add(w);
                 }
-                jb.endArray();
-                return jb.toString();
+                return wifis;
             }
         }
     }

@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
+import javax.xml.bind.JAXBException;
 import ki.wardrive4.web.android.Sync;
 import ki.wardrive4.web.data.WiFi;
 import ki.wardrive4.web.data.WiFiSecurity;
+import ki.wardrive4.web.data.WiFis;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,7 +69,7 @@ public class SyncTest
     }
     
     @Test
-    public void test() throws NamingException, SQLException
+    public void test() throws NamingException, SQLException, JAXBException
     {
         List<WiFi> wifis = new ArrayList<>();
         WiFi w;
@@ -89,8 +91,8 @@ public class SyncTest
         wifis.add(w);
         
         Sync.push(connection, "user", wifis);
-        String result = Sync.fetch(connection, "user", w.timestamp - 1);
+        List<WiFi> wifis2 = Sync.fetch(connection, "user", w.timestamp - 1);
         
-        assert !result.equals("[]");
+        assert wifis2.size() > 0;
     }
 }
