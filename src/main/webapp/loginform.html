@@ -3,11 +3,30 @@
     <head>
         <title>Login</title>
         <meta charset="UTF-8"/>
+        <style type="text/css">
+            body
+                {text-align: center}
+            form
+                {margin: 0 auto; width: 230px}
+            input[type="text"], input[type="password"]
+                {color: black; margin-left: 80px; display: block; width: 120px}
+            input[type="text"].checking
+                {color: gray}
+            input[type="text"].ok
+                {color: green}
+            input[type="text"].error, input[type="password"].error
+                {color: red; border-color: red;}
+            label
+                {float: left; display: block; text-align: right; width: 80px; padding-right: 3px}
+            button
+                {display: block; margin-left: 83px}
+        </style>
     </head>
     <body>
+        <h1>Wardrive</h1>
         <form action="login" method="post">
-            <label for="username">Username:</label><input id="username" type="text" name="username"/><br/>
-            <label for="password">Password:</label><input id="password" type="password" name="password"/><br/>
+            <label for="username">Username:</label><input id="username" type="text" name="username"/>
+            <label for="password">Password:</label><input id="password" type="password" name="password"/>
             <button type="submit">Login</button> <button type="button" onclick="location.href='register.html'">Register</button>
         </form>
     </body>

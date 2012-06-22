@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>Registration</title>
         <meta charset="UTF-8"/>
         <script src="http://www.google.com/jsapi" type="text/javascript"></script>
         <script type="text/javascript">google.load("jquery", "1.7");</script>
@@ -40,6 +40,8 @@
                                     $("#username").removeClass("checking");
                                     $("#username").addClass("error");
                                 }
+                                
+                                submitEnabledCheck();
                             }
                         });
                         keyupTimeout = null;
@@ -55,11 +57,23 @@
                         $("#password, #password2").removeClass("error");
                     else
                         $("#password, #password2").addClass("error");
+                    
+                    submitEnabledCheck();
                 });
 
                 // Trigger the event so it sets them to error for being blank
                 $("#username, #password, #password2").addClass("error");
+                
+                submitEnabledCheck();
             });
+            
+            function submitEnabledCheck()
+            {
+                if ($("form .error").length > 0)
+                    $("form button").attr("disabled", "true");
+                else
+                    $("form button").removeAttr("disabled");
+            }
 
             function validate()
             {
@@ -70,21 +84,31 @@
 
         </script>
         <style type="text/css">
+            body
+                {text-align: center}
+            form
+                {margin: 0 auto; width: 230px}
             input[type="text"], input[type="password"]
-                {color: black}
+                {color: black; margin-left: 80px; display: block; width: 120px}
             input[type="text"].checking
                 {color: gray}
             input[type="text"].ok
                 {color: green}
             input[type="text"].error, input[type="password"].error
-                {color: red; border: solid 1px red;}
+                {color: red; border-color: red;}
+            label
+                {float: left; display: block; text-align: right; width: 80px; padding-right: 3px}
+            button
+                {display: block; margin-left: 83px}
         </style>
     </head>
     <body>
+        <h1>Wardrive</h1>
+        <h2>Registering for a new account</h2>
         <form action="register" method="post" onsubmit="return validate()">
-            <label for="username">Username: </label><input id="username" type="text" name="username"/><br/>
-            <label for="password">Password: </label><input id="password" type="password" name="password"/><br/>
-            <label for="password">[Password repeated]: </label><input id="password2" type="password" name="password2"/><br/>
+            <label for="username">Username: </label><input id="username" type="text" name="username"/>
+            <label for="password">Password: </label><input id="password" type="password" name="password"/>
+            <label for="password">Password: </label><input id="password2" type="password" name="password2"/>
             <button type="submit">Register</button>
         </form>
     </body>
