@@ -77,6 +77,9 @@ public class Sync
     
     public static void push(Connection c, String username, List<WiFi> wifis) throws SQLException
     {
+        if (wifis == null)
+            return;
+        
         // Consider only the ones that have a greater timestamp. If we
         // are the ones having the most updated data, then just leave
         // it as it is in our DB. In the sequential call to the sync as
