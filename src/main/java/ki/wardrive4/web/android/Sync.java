@@ -131,7 +131,7 @@ public class Sync
                     else
                     {
                         // Check if the timestamp is superior
-                        if (rs.getTimestamp("timestamp").getTime() < wifi.timestamp)
+                        if (rs.getTimestamp("t_timestamp").getTime() < wifi.timestamp)
                         {
                             try (PreparedStatement s_insert = c.prepareStatement(
                                 "update wifi set "
