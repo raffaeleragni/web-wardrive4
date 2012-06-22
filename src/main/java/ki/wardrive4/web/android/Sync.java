@@ -85,7 +85,7 @@ public class Sync
         {
             // 1: check if the user has this one already
             try (PreparedStatement s = c.prepareStatement(
-                "select * from wifi where fk_user = ? and id > ?"))
+                "select * from wifi where fk_user = ? and id = ?"))
             {
                 s.setString(1, username);
                 s.setString(2, wifi.id);
