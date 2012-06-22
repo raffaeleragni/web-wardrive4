@@ -57,6 +57,7 @@ public class SyncServlet extends HttpServlet
             return;
         }
         
+        WiFis wifis;
         try (Connection c = ConnectionUtils.getConnection())
         {
             switch (request.getParameter("action"))
@@ -65,13 +66,15 @@ public class SyncServlet extends HttpServlet
                     long mark = Long.parseLong(request.getParameter("mark"));
                     // Dump out the JSON
                     List<WiFi> out = Sync.fetch(c, username, mark);
+                    wifis = new WiFis();
+                    wifis.wifi = out;
                     response.setContentType("text/xml");
-                    marshaller.marshal(out, response.getWriter());
+                    marshaller.marshal(wifis, response.getWriter());
                     break;
 
                 case "push":
                     String data = request.getParameter("data");
-                    WiFis wifis = unmarshaller
+                    wifis = unmarshaller
                         .unmarshal(new StreamSource(new StringReader((data))), WiFis.class)
                         .getValue();
                     Sync.push(c, username, wifis.wifi);
