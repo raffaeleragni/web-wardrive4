@@ -34,7 +34,7 @@ public class Sync
     // The limit of how much records we will send back to Android at once.
     // Considered it to be used also in 3G situation, better to keep it to a
     // minimum, and increment the frequency of updates.
-    private static final int PAGE_LIMIT = 10;
+    private static final int PAGE_LIMIT = 250;
     
     public static List<WiFi> fetch(Connection c, String username, long mark) throws NamingException, SQLException
     {
