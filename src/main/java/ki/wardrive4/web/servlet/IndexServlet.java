@@ -37,6 +37,8 @@ public class IndexServlet extends HttpServlet
             response.sendRedirect("loginform.html");
             return;
         }
+        
+        response.sendRedirect("index.html");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
