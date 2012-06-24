@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Login</title>
+        <title>Wardrive</title>
         <meta charset="UTF-8"/>
-        <style type="text/css">
-            body
-                {text-align: center}
-        </style>
+        <link rel="stylesheet" type="text/css" href="css/index.css"/>
+        <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+        <script type="text/javascript">google.load("jquery", "1.7");</script>
+        <script type="text/javascript">google.load("maps","3", {"other_params":"sensor=true&key=AIzaSyAI1a33Om0c5oLIHxpC066S4oQL2rjTAJ0"})</script>
+        <script type="text/javascript" src="js/index.js"></script>
     </head>
     <body>
-        <h1>Wardrive</h1>
-        <p>Download apk (dev build): <a href="https://github.com/raffaeleragni/android-wardrive4/downloads">Downloads</a></p>
+        <div id="map_canvas"></div>
+        <div id="wardrive_menu">
+            <a class="menu" href="javascript:void(0)">Wardrive</a>
+        </div>
+        <div id="wardrive_menu_block">
+            <p style="text-align: center">
+                Download apk (dev build):
+                <a href="https://github.com/raffaeleragni/android-wardrive4/downloads">Downloads</a>
+            </p>
+        </div>
     </body>
 </html>
