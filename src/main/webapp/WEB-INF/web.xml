@@ -31,7 +31,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>ajax-login</servlet-name>
-        <servlet-class>ki.wardrive4.web.servlet.android.AJAXLoginServlet</servlet-class>
+        <servlet-class>ki.wardrive4.web.servlet.ajax.AJAXLoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ajax-login</servlet-name>
@@ -39,7 +39,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>ajax-sync</servlet-name>
-        <servlet-class>ki.wardrive4.web.servlet.android.SyncServlet</servlet-class>
+        <servlet-class>ki.wardrive4.web.servlet.ajax.SyncServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ajax-sync</servlet-name>

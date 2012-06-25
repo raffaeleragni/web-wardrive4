@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ki.wardrive4.web.android;
+package ki.wardrive4.web.sync;
 
 import java.sql.*;
 import java.util.ArrayList;

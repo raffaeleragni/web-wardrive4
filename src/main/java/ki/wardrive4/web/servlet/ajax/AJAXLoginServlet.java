@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ki.wardrive4.web.servlet.android;
+package ki.wardrive4.web.servlet.ajax;
 
 import java.io.IOException;
 import java.sql.Connection;

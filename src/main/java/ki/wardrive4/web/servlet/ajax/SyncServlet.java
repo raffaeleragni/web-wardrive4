@@ -16,7 +16,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ki.wardrive4.web.servlet.android;
+package ki.wardrive4.web.servlet.ajax;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -33,10 +33,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-import ki.wardrive4.web.android.Sync;
 import ki.wardrive4.web.data.WiFi;
 import ki.wardrive4.web.data.WiFis;
 import ki.wardrive4.web.servlet.LoginServlet;
+import ki.wardrive4.web.sync.Sync;
 import ki.wardrive4.web.utils.ConnectionUtils;
 
 /**

@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
 import javax.xml.bind.JAXBException;
-import ki.wardrive4.web.android.Sync;
+import ki.wardrive4.web.sync.Sync;
 import ki.wardrive4.web.data.WiFi;
 import ki.wardrive4.web.data.WiFiSecurity;
 import ki.wardrive4.web.data.WiFis;
