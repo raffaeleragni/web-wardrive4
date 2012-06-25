@@ -34,7 +34,7 @@ public class IndexServlet extends HttpServlet
     {
         if (request.getSession().getAttribute(LoginServlet.ATT_USERNAME) == null)
         {
-            response.sendRedirect("loginform.html");
+            response.sendRedirect(LoginServlet.FWD_LOGINFORM);
             return;
         }
         

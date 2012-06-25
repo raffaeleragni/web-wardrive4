@@ -19,63 +19,30 @@
 package ki.wardrive4.web.servlet;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import static ki.wardrive4.web.utils.ConnectionUtils.getConnection;
-import static ki.wardrive4.web.utils.SHA1Utils.sha1;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Raffaele Ragni <raffaele.ragni@gmail.com>
  */
-public class LoginServlet extends HttpServlet
+public class LogoutServlet extends HttpServlet
 {
-    public static final String ATT_USERNAME = "username";
-    public static final String FWD_LOGINFORM = "loginform.html";
-    public static final String FWD_LOGINOK = "index";
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-
-        // Invalid parameters - still consider as unauthorized
-        if (username == null || password == null || username.isEmpty() || password.isEmpty())
+        HttpSession session = request.getSession(false);
+        if (session != null)
         {
-            response.sendRedirect(FWD_LOGINFORM);
-            return;
+            session.setAttribute(LoginServlet.ATT_USERNAME, null);
+            // Just to be sure...
+            session.invalidate();
         }
-
-        boolean loggedIn;
-        try (Connection c = getConnection())
-        {
-            try (PreparedStatement s = c.prepareStatement(
-                "select count(username) from users where username = ? and password = ?"))
-            {
-                s.setString(1, username);
-                s.setString(2, sha1(password));
-                try (ResultSet rs = s.executeQuery())
-                {
-                    rs.next();
-                    loggedIn = rs.getInt(1) > 0;
-                }
-            }
-        }
-
-        if (loggedIn)
-        {
-            request.getSession().setAttribute(ATT_USERNAME, username);
-            response.sendRedirect(FWD_LOGINOK);
-        }
-        else
-            response.sendRedirect(FWD_LOGINFORM);
+        response.sendRedirect(LoginServlet.FWD_LOGINFORM);
     }
-
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
