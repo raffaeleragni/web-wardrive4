@@ -99,7 +99,7 @@ function syncData()
 {
     db.transaction(function (t2)
     {
-        t2.executeSql("select max(timestamp) as t from wifi", [], function (t2, r)
+        t2.executeSql("select coalesce(max(timestamp), 0) as t from wifi", [], function (t2, r)
         {
             var tstamp = 0;
             if (r.rows.length > 0)
