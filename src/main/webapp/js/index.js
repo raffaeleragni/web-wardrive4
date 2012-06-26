@@ -87,7 +87,7 @@ function sessionCheck()
     {
         async: false,
         url: "session-ok",
-        statusCode: { 401: function() { location.href = "loginform.html"; } }
+        statusCode: {401: function() {location.href = "loginform.html";}}
     });
     // Repeat this check each 5 minutes, so that the session is kept alive as
     // long as the app is up.
@@ -177,6 +177,8 @@ function syncData()
                         });
                         // Data was found, just wait a minimum to requery again
                         setTimeout(syncData, SYNCDATA_PROCWAIT);
+                        // Also reload data since it's changed.
+                        reloadData();
                     },
                     sqlError);
                 }
@@ -188,6 +190,9 @@ function syncData()
 
 function reloadData()
 {
+    if (map == null || map.getBounds() == null)
+        return;
+    
     var lat1 = map.getBounds().getNorthEast().lat();
     var lon1 = map.getBounds().getNorthEast().lng();
     var lat2 = map.getBounds().getSouthWest().lat();
