@@ -17,23 +17,43 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+// Delay between subsequent sync calls as long as there is data.
+var SYNCDATA_PROCWAIT = 2500;
+// Time to wait for checking data to be synced
+var SYNCDATA_REFRESHDELAY = 300000;
+
+
+// -----------------------------------------------------------------------------
+
+
 var map;
 var db;
+var mapMoveTimeout = null;
+var markersArray = [];
+var mapLoaded = false;
 
-function sessionCheck()
+
+// -----------------------------------------------------------------------------
+
+
+function addMarker(m)
 {
-    // Attempt a check for session.
-    // Necessary because the app accesses the user's data.
-    // If no session available, redirect to the login page.
-    $.ajax(
-    {
-        async: false,
-        url: "session-ok",
-        statusCode: { 401: function() { location.href = "loginform.html"; } }
-    });
-    // Repeat this check each 5 minutes, so that the session is kept alive as
-    // long as the app is up.
-    setTimeout(sessionCheck, 300000);
+    var marker = new google.maps.Marker(m);
+    marker.setMap(map);
+    markersArray.push(marker);
+}
+
+function clearMarkers()
+{
+    if (markersArray)
+        for (i in markersArray)
+            markersArray[i].setMap(null);
+}
+
+function sqlError(err)
+{
+    console.log(err);
 }
 
 function createDB()
@@ -58,10 +78,21 @@ function createDB()
     });
 }
 
-// Delay between subsequent sync calls as long as there is data.
-var SYNCDATA_PROCWAIT = 2500;
-// Time to wait for checking data to be synced
-var SYNCDATA_REFRESHDELAY = 300000;
+function sessionCheck()
+{
+    // Attempt a check for session.
+    // Necessary because the app accesses the user's data.
+    // If no session available, redirect to the login page.
+    $.ajax(
+    {
+        async: false,
+        url: "session-ok",
+        statusCode: { 401: function() { location.href = "loginform.html"; } }
+    });
+    // Repeat this check each 5 minutes, so that the session is kept alive as
+    // long as the app is up.
+    setTimeout(sessionCheck, 300000);
+}
 
 // Synchronize 
 function syncData()
@@ -155,62 +186,64 @@ function syncData()
     sqlError);
 }
 
-function sqlError(err)
+function reloadData()
 {
-    console.log(err);
-}
-
-function refreshData(lat1, lon1, lat2, lon2)
-{
+    var lat1 = map.getBounds().getNorthEast().lat();
+    var lon1 = map.getBounds().getNorthEast().lng();
+    var lat2 = map.getBounds().getSouthWest().lat();
+    var lon2 = map.getBounds().getSouthWest().lng();
+    
+    // Make sure which one is the greatest
+    if (lat1 > lat2)
+    {
+        var tmp = lat1;
+        lat1 = lat2;
+        lat2 = tmp;
+    }
+    if (lon1 > lon2)
+    {
+        var tmp = lon1;
+        lon1 = lon2;
+        lon2 = tmp;
+    }
     // TODO: add a loading icon in a corner that will be active as long as AJAX
     // requests are sent to server and there is data to process.
     // No loading should appear if a single request gives 0 updates at first shot.
-    
-    // TODO: clear map visually of available points
     
     // Select rawly the available data and display it (no-delay).
     db.transaction(function (t)
     {
         t.executeSql(
-            "select * from wifi where lat between ? and ? and lon between ? and ?",
+            "select * from wifi where lat between ? and ? and lon between ? and ? order by timestamp desc limit 100",
             [lat1, lat2, lon1, lon2],
             function(t, r)
             {
+                clearMarkers();
                 for (var i=0; i<r.rows.length; i++)
                 {
                     var item = r.rows.item(i);
-                    // TODO: add points to map
+                    addMarker({position: new google.maps.LatLng(item['lat'], item['lon'])});
                 }
-                // Get the max timestamp and query the server for updates.
-                var tstamp = getMaxTimestamp();
-                // Query the server, if new items were available, refresh the data
-                // (recall this function again).
-                $.ajax(
-                {
-                    url: "ajaxsync",
-                    data:
-                    {
-                        action: "fetch",
-                        mark: tstamp
-                    },
-                    dataType: "xml",
-                    success: function(d)
-                    {
-                        // refreshData(lat1, lon1, lat2, lon2);
-                    }
-                });
             });
-    });
+    },
+    sqlError);
 }
 
 $().ready(function ()
 {
-    sessionCheck();
     // Init the database
     db = openDatabase("wifi", "1.0", "WiFi", 10 * 1024 * 1024);
     createDB();
+    // Check if session server-side is OK
+    sessionCheck();
+    // Call syncData() once, it will start synchronizing the data and continue.
+    syncData();
     // Toggle the menu action
-    $("#wardrive_menu").click(function (){ $("#wardrive_menu_block").toggle(); $("#wardrive_menu").toggleClass("open"); });
+    $("#wardrive_menu").click(function ()
+    {
+        $("#wardrive_menu_block").toggle();
+        $("#wardrive_menu").toggleClass("open");
+    });
     // Init the google maps
     map = new google.maps.Map(document.getElementById("map_canvas"),
     {
@@ -218,7 +251,25 @@ $().ready(function ()
         center: new google.maps.LatLng(43, 13),
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
-    // TODO: add callback to map movement, to call refreshData() with map bounds.
-    // Call syncData() once, it will start synchronizing the data.
-    syncData();
+    // Callback to map movement, to call a delayed reloadData()
+    google.maps.event.addListener(map, 'center_changed', function()
+    {
+        // less than a second after the center of the map has changed,
+        // reload data
+        if (mapMoveTimeout != null)
+            clearTimeout(mapMoveTimeout);
+        mapMoveTimeout = setTimeout(function ()
+        {
+            reloadData();
+            mapMoveTimeout = null;
+        },
+        750);
+    });
+    // Watch for when the map is available
+    google.maps.event.addListener(map, 'idle', function()
+    {
+        if(!mapLoaded)
+            reloadData();
+        mapLoaded=true; 
+    });
 });
