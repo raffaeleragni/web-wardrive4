@@ -1,3 +1,21 @@
+/*
+ *   wardrive4-web - android wardriving application (web side)
+ *   Copyright (C) 2012 Raffaele Ragni
+ *   https://github.com/raffaeleragni/web-wardrive4
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 var map;
 var db;
@@ -40,20 +58,106 @@ function createDB()
     });
 }
 
-function getMaxTimestamp()
+// Delay between subsequent sync calls as long as there is data.
+var SYNCDATA_PROCWAIT = 2500;
+// Time to wait for checking data to be synced
+var SYNCDATA_REFRESHDELAY = 300000;
+
+// Synchronize 
+function syncData()
 {
-    db.transaction(function (t)
+    db.transaction(function (t2)
     {
-        t.executeSql(
-            "select max(timestamp) as m from wifi", [],
-            function(t, r)
+        t2.executeSql("select max(timestamp) as t from wifi", [], function (t2, r)
+        {
+            var tstamp = 0;
+            if (r.rows.length > 0)
+                tstamp = r.rows.item(0)['t'];
+            // May get strange results from above...
+            if (isNaN(tstamp))
+                tstamp = 0;
+
+            $.ajax(
             {
-                if (r.rows.length == 0)
-                    return 0;
-                else
-                    return r.rows.item(i)["m"];
+                url: "ajaxsync",
+                data:
+                {
+                    action: "fetch",
+                    mark: tstamp
+                },
+                dataType: "xml",
+                success: function(d)
+                {
+                    db.transaction(function (t)
+                    {
+                        var wifis = d == null ? null : $(d).find("wifi");
+                        // No data found, sleep the long time
+                        if (wifis == null || wifis.length == 0)
+                        {
+                            setTimeout(syncData, SYNCDATA_REFRESHDELAY);
+                            return;
+                        }
+
+                        wifis.each(function ()
+                        {
+                            var id = $(this).attr("id");
+                            var parameters =
+                            [
+                                $(this).find("bssid").text(),
+                                $(this).find("ssid").text(),
+                                $(this).find("capabilities").text(),
+                                $(this).find("security").text(),
+                                $(this).find("level").text(),
+                                $(this).find("frequency").text(),
+                                $(this).find("lat").text(),
+                                $(this).find("lon").text(),
+                                $(this).find("alt").text(),
+                                $(this).find("geohash").text(),
+                                $(this).find("timestamp").text(),
+                                id
+                            ];
+                            t.executeSql("select timestamp from wifi where _id = ?", [id], function (t, r)
+                            {
+                                if (r.rows.length > 0)
+                                {
+                                    var rec_tstamp = parseInt(r.rows.item(0)['timestamp']);
+                                    var upd_tstamp = parseInt($(this).find("timestamp").text());
+                                    // Make sure the new data is actually new (should be)
+                                    if (upd_tstamp > rec_tstamp)
+                                        t.executeSql("update wifi set "
+                                            + " bssid = ?,"
+                                            + " ssid = ?,"
+                                            + " capabilities = ?,"
+                                            + " security = ?,"
+                                            + " level = ?,"
+                                            + " frequency = ?,"
+                                            + " lat = ?,"
+                                            + " lon = ?,"
+                                            + " alt = ?,"
+                                            + " geohash = ?,"
+                                            + " timestamp = ?"
+                                            + " where _id = ?",
+                                            parameters);
+                                }
+                                else
+                                    t.executeSql("insert into wifi (bssid, ssid, capabilities, security, level, frequency, lat, lon, alt, geohash, timestamp, _id) "
+                                        + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", parameters);
+                            });
+                        });
+                        // Data was found, just wait a minimum to requery again
+                        setTimeout(syncData, SYNCDATA_PROCWAIT);
+                    },
+                    sqlError);
+                }
             });
-    });
+        });
+    },
+    sqlError);
+}
+
+function sqlError(err)
+{
+    console.log(err);
 }
 
 function refreshData(lat1, lon1, lat2, lon2)
@@ -72,9 +176,9 @@ function refreshData(lat1, lon1, lat2, lon2)
             [lat1, lat2, lon1, lon2],
             function(t, r)
             {
-                for (var i=0; i<results.rows.length; i++)
+                for (var i=0; i<r.rows.length; i++)
                 {
-                    var item = results.rows.item(i);
+                    var item = r.rows.item(i);
                     // TODO: add points to map
                 }
                 // Get the max timestamp and query the server for updates.
@@ -115,4 +219,6 @@ $().ready(function ()
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
     // TODO: add callback to map movement, to call refreshData() with map bounds.
+    // Call syncData() once, it will start synchronizing the data.
+    syncData();
 });

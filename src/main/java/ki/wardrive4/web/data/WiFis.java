@@ -1,7 +1,7 @@
 /*
  *   wardrive4-web - android wardriving application (web side)
  *   Copyright (C) 2012 Raffaele Ragni
- *   https://github.com/raffaeleragni/android-wardrive4
+ *   https://github.com/raffaeleragni/web-wardrive4
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
