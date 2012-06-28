@@ -260,7 +260,33 @@ function reloadData()
                 for (var i=0; i<r.rows.length; i++)
                 {
                     var item = r.rows.item(i);
-                    addMarker({position: new google.maps.LatLng(item['lat'], item['lon'])});
+                    var color = "#000000";
+                    switch (item['security'])
+                    {
+                        case 0:
+                            color = "#00c800";
+                            break;
+                        case 1:
+                            color = "#eba017";
+                            break;
+                        case 2:
+                            color = "#FF0000";
+                            break;
+                    }
+                    addMarker(
+                    {
+                        position: new google.maps.LatLng(item['lat'], item['lon']),
+                        icon:
+                        {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 7,
+                            fillOpacity: 0.75,
+                            strokeOpacity: 0.75,
+                            strokeWeight: 1,
+                            strokeColor: color,
+                            fillColor: color
+                        }
+                    });
                 }
             });
     },
