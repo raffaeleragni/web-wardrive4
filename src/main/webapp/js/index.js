@@ -300,7 +300,7 @@ function reloadData()
                             + "<br/><span style=\"font-size: smaller\">" + "<em >"+item['bssid']+"</em>"
                             + "<br/>" + item['capabilities']
                             + "<br/>" + item['level'] + " dBm"
-                            + "<br/>" + item['frequency'] + " Ghz"
+                            + "<br/>" + item['frequency'] + " Mhz"
                             + "</span>"
                     });
                 }
