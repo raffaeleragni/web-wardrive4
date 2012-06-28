@@ -50,6 +50,10 @@ var timelineFilterStart = null, timelineFilterStop = null; // null = no filter
 function addMarker(m)
 {
     var marker = new google.maps.Marker(m);
+    google.maps.event.addListener(marker, 'click', function()
+    {
+        new google.maps.InfoWindow( {content: m.infoText} ).open(map, marker);
+    });
     marker.setMap(map);
     markersArray.push(marker);
 }
@@ -275,6 +279,12 @@ function reloadData()
                     }
                     addMarker(
                     {
+                        id: item['id'],
+                        ssid: item['ssid'],
+                        title: item['ssid'],
+                        clickable: true,
+                        flat: true,
+                        draggable: false,
                         position: new google.maps.LatLng(item['lat'], item['lon']),
                         icon:
                         {
@@ -285,7 +295,13 @@ function reloadData()
                             strokeWeight: 1,
                             strokeColor: color,
                             fillColor: color
-                        }
+                        },
+                        infoText: "<span style=\"font-size: bigger\"><strong>"+item['ssid']+"</strong></span>"
+                            + "<br/><span style=\"font-size: smaller\">" + "<em >"+item['bssid']+"</em>"
+                            + "<br/>" + item['capabilities']
+                            + "<br/>" + item['level'] + " dBm"
+                            + "<br/>" + item['frequency'] + " Ghz"
+                            + "</span>"
                     });
                 }
             });
