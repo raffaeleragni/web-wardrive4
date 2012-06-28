@@ -22,6 +22,15 @@
 var SYNCDATA_PROCWAIT = 2500;
 // Time to wait for checking data to be synced
 var SYNCDATA_REFRESHDELAY = 300000;
+// First 12 slots backwards form the beginning are months.
+// From that on, it's a year per slot.
+// Afer 10 years it becomes "all"
+// Total = 22
+var SLIDER_MAX = 22;
+// Month names
+var MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// Max WiFi visible at once
+var MAX_WIFI = 250;
 
 
 // -----------------------------------------------------------------------------
@@ -32,6 +41,7 @@ var db;
 var mapMoveTimeout = null;
 var markersArray = [];
 var mapLoaded = false;
+var timelineFilterStart = null, timelineFilterStop = null; // null = no filter
 
 
 // -----------------------------------------------------------------------------
@@ -199,15 +209,16 @@ function reloadData()
     var lon2 = map.getBounds().getSouthWest().lng();
     
     // Make sure which one is the greatest
+    var tmp;
     if (lat1 > lat2)
     {
-        var tmp = lat1;
+        tmp = lat1;
         lat1 = lat2;
         lat2 = tmp;
     }
     if (lon1 > lon2)
     {
-        var tmp = lon1;
+        tmp = lon1;
         lon1 = lon2;
         lon2 = tmp;
     }
@@ -215,15 +226,37 @@ function reloadData()
     // requests are sent to server and there is data to process.
     // No loading should appear if a single request gives 0 updates at first shot.
     
+    var params = [lat1, lat2, lon1, lon2];
+    var timelineCondition = "";
+    if (timelineFilterStart != null && timelineFilterStop != null)
+    {
+        timelineCondition = " and timestamp between ? and ? ";
+        params.push(timelineFilterStart);
+        params.push(timelineFilterStop);
+    }
+    else if (timelineFilterStart != null)
+    {
+        timelineCondition = " and timestamp > ?";
+        params.push(timelineFilterStart);
+    }
+    else if (timelineFilterStop != null)
+    {
+        timelineCondition = " and timestamp < ?";
+        params.push(timelineFilterStop);
+    }
+    
     // Select rawly the available data and display it (no-delay).
     db.transaction(function (t)
     {
         t.executeSql(
-            "select * from wifi where lat between ? and ? and lon between ? and ? order by timestamp desc limit 100",
-            [lat1, lat2, lon1, lon2],
+            "select * from wifi where lat between ? and ? and lon between ? and ? "
+                + timelineCondition
+                +" order by timestamp desc limit " + MAX_WIFI,
+            params,
             function(t, r)
             {
                 clearMarkers();
+                updateVisibleWiFiCount(r.rows.length);
                 for (var i=0; i<r.rows.length; i++)
                 {
                     var item = r.rows.item(i);
@@ -232,6 +265,98 @@ function reloadData()
             });
     },
     sqlError);
+}
+
+function onTimelineSlide(e, ui)
+{
+    var v1 = ui.values[0];
+    var v2 = ui.values[1];
+    
+    var v1leftperc = v1 / SLIDER_MAX * 100;
+    var v2leftperc = v2 / SLIDER_MAX * 100;
+    var centerperc = (v2leftperc - v1leftperc) / 2 + v1leftperc;
+    $("#timeline-tips-btn1").css({left: v1leftperc+"%"});
+    $("#timeline-tips-btn2").css({left: v2leftperc+"%"});
+    $("#timeline-tips-desc").css({left: centerperc+"%"});
+    
+    var date1 = getTimelineTimestamp(v1);
+    var date2 = getTimelineTimestamp(v2);
+    var tstamp1desc = v1 == 0 ? "EVER" : getTimelineTimestampDescription(date1, SLIDER_MAX-v1 <= 12);
+    var tstamp2desc = v2 == SLIDER_MAX ? "NOW" : getTimelineTimestampDescription(date2, SLIDER_MAX-v2 <= 12);
+    
+    $("#timeline-tips-btn1").text(tstamp1desc);
+    $("#timeline-tips-btn2").text(tstamp2desc);
+    
+    if (v1 > 0)
+        timelineFilterStart = date1.valueOf();
+    else
+        timelineFilterStart = null;
+    if (v2 < SLIDER_MAX)
+        timelineFilterStop = date2.valueOf();
+    else
+        timelineFilterStop = null;
+    reloadData();
+}
+
+function getTimelineTimestamp(value)
+{
+    var delta = SLIDER_MAX - value;
+    var now = new Date();
+    var result = new Date();
+    var m = now.getMonth();
+    var y = now.getFullYear();
+    if (delta < 12)
+    {
+        // Now - delta months
+        m -= delta;
+        if (m < 0)
+        {
+            y --;
+            m = 12 + m;
+        }
+        result.setFullYear(y);
+        result.setMonth(m);
+        result.setDate(1);
+        result.setHours(0);
+        result.setMinutes(0);
+        result.setSeconds(0);
+        result.setMilliseconds(0);
+        return result;
+    }
+    else
+    {
+        delta -= 12;
+        // each 1 after 12 subtracts a year.
+        // Altough an exact "12" (which becomes "0") would mean the beginning of
+        // the year of today - 12 months, meaning the last one.
+        // Result: increment delta by 1.
+        delta++;
+        y -= delta;
+        result.setFullYear(y);
+        result.setMonth(0);
+        result.setDate(1);
+        result.setHours(0);
+        result.setMinutes(0);
+        result.setSeconds(0);
+        result.setMilliseconds(0);
+        return result;
+    }
+}
+
+function updateVisibleWiFiCount(count)
+{
+    $("#timeline-tips-desc").text("");
+    $("#timeline-tips-desc").append($("<span>WiFi visible: "+count+"</span><br/>"));
+    if (count >= MAX_WIFI)
+        $("#timeline-tips-desc").append($("<span style=\"color: red\"><em>Limited</em></span>"));
+}
+
+function getTimelineTimestampDescription(date, showMonth)
+{
+    if (showMonth)
+        return MONTH_NAMES[date.getMonth()] + " " + date.getFullYear();
+    else
+        return date.getFullYear();
 }
 
 $().ready(function ()
@@ -249,6 +374,17 @@ $().ready(function ()
         $("#wardrive_menu_block").toggle();
         $("#wardrive_menu").toggleClass("open");
     });
+    // Init timeline slider
+    $("#timeline").slider(
+    {
+        range: true,
+        min: 0,
+        max: SLIDER_MAX,
+        step: 1,
+        values: [20, 22],
+        slide: onTimelineSlide
+    });
+    onTimelineSlide(null, {values: [20, 22]});
     // Init the google maps
     map = new google.maps.Map(document.getElementById("map_canvas"),
     {

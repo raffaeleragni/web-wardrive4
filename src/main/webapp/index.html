@@ -22,9 +22,11 @@
         <title>Wardrive</title>
         <meta charset="UTF-8"/>
         <link rel="stylesheet" type="text/css" href="css/index.css"/>
+        <link rel="stylesheet" type="text/css" href="css/ui-lightness/jquery-ui-1.8.21.custom.css"/>
         <script src="http://www.google.com/jsapi" type="text/javascript"></script>
         <script type="text/javascript">google.load("jquery", "1.7");</script>
-        <script type="text/javascript">google.load("maps","3", {"other_params":"sensor=true&key=AIzaSyAI1a33Om0c5oLIHxpC066S4oQL2rjTAJ0"})</script>
+        <script type="text/javascript">google.load("jqueryui", "1.8");</script>
+        <script type="text/javascript">google.load("maps", "3", {"other_params":"sensor=true&key=AIzaSyAI1a33Om0c5oLIHxpC066S4oQL2rjTAJ0"})</script>
         <script type="text/javascript" src="js/index.js"></script>
     </head>
     <body>
@@ -37,6 +39,12 @@
                 Download apk (dev build):
                 <a href="https://github.com/raffaeleragni/android-wardrive4/downloads">Downloads</a> | <a href="logout">Logout</a>
             </p>
+        </div>
+        <div id="timeline"></div>
+        <div id="timeline-tips">
+            <div id="timeline-tips-desc"></div>
+            <div id="timeline-tips-btn1">2010</div>
+            <div id="timeline-tips-btn2">NOW</div>
         </div>
     </body>
 </html>
