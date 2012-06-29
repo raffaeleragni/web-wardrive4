@@ -146,6 +146,7 @@ function syncData()
                         wifis.each(function ()
                         {
                             var id = $(this).attr("id");
+                            var upd_tstamp = $(this).find("timestamp").text();
                             var parameters =
                             [
                                 $(this).find("bssid").text(),
@@ -166,7 +167,6 @@ function syncData()
                                 if (r.rows.length > 0)
                                 {
                                     var rec_tstamp = parseInt(r.rows.item(0)['timestamp']);
-                                    var upd_tstamp = parseInt($(this).find("timestamp").text());
                                     // Make sure the new data is actually new (should be)
                                     if (upd_tstamp > rec_tstamp)
                                         t.executeSql("update wifi set "
