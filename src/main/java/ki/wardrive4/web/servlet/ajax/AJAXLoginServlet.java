@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,7 @@ import static ki.wardrive4.web.utils.SHA1Utils.sha1;
  *
  * @author Raffaele Ragni <raffaele.ragni@gmail.com>
  */
+@WebServlet(name = "ajaxlogin", urlPatterns = {"/ajaxlogin"})
 public class AJAXLoginServlet extends HttpServlet
 {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception

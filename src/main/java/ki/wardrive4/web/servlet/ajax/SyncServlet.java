@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,7 @@ import ki.wardrive4.web.utils.ConnectionUtils;
  * 
  * @author Raffaele Ragni <raffaele.ragni@gmail.com>
  */
+@WebServlet(name = "ajaxsync", urlPatterns = {"/ajaxsync"})
 public class SyncServlet extends HttpServlet
 {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception
