@@ -1,0 +1,41 @@
+<!--
+ *   wardrive4-web - android wardriving application (web side)
+ *   Copyright (C) 2012 Raffaele Ragni
+ *   https://github.com/raffaeleragni/web-wardrive4
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Unregister</title>
+        <meta charset="UTF-8"/>
+        <style type="text/css">
+            body
+                {text-align: center}
+            form, p
+                {margin: 0 auto; width: 400px; text-align: left}
+        </style>
+    </head>
+    <body>
+        <h1>Wardrive</h1>
+        <h2>Deleting account PERMANENTLY</h2>
+        <p>To remove the account, and for safety measures, type <br/>'<strong>delete account</strong>' in the form below and click unregister to proceed.</p>
+        <p>The username will afterwards become available to be registered again, and all data assigned to the old user will be PERMANENTLY deleted.</p>
+        <form action="unregister" method="post">
+            <input id="check" type="text" name="check"/>
+            <button type="submit">Unregister</button>
+        </form>
+    </body>
+</html>
