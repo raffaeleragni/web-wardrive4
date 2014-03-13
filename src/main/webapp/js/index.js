@@ -416,6 +416,7 @@ $().ready(function ()
         $("#wardrive_menu_block").toggle();
         $("#wardrive_menu").toggleClass("open");
     });
+    $("#wardrive_menu").click();
     // Init timeline slider
     $("#timeline").slider(
     {
