@@ -23,6 +23,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
@@ -30,7 +31,6 @@ import javax.xml.bind.JAXBException;
 import ki.wardrive4.web.sync.Sync;
 import ki.wardrive4.web.data.WiFi;
 import ki.wardrive4.web.data.WiFiSecurity;
-import ki.wardrive4.web.data.WiFis;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,17 +49,27 @@ public class SyncTest
     };
     
     private static Connection connection;
+
     @BeforeClass
     public static void init() throws ClassNotFoundException, SQLException
     {
         Class.forName("org.hsqldb.jdbcDriver");
         connection = DriverManager.getConnection("jdbc:hsqldb:mem:test");
         connection.setAutoCommit(true);
-        for (String sql: TBL_CREATE)
-            try (PreparedStatement s = connection.prepareStatement(sql))
-            {
-                s.executeUpdate();
-            }
+        Arrays.asList(TBL_CREATE).stream()
+            .forEach(SyncTest::executeSQL);
+    }
+    
+    public static void executeSQL(String sql)
+    {
+        try (PreparedStatement s = connection.prepareStatement(sql))
+        {
+            s.executeUpdate();
+        }
+        catch (SQLException ex)
+        {
+            throw new RuntimeException(ex);
+        }
     }
     
     @AfterClass
